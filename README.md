@@ -1,13 +1,13 @@
 [![forthebadge](https://forthebadge.com/images/badges/fo-shizzle.svg)](https://forthebadge.com)
 
 
-[![Build Status](https://travis-ci.org/Ort-Maximax/lpp-front-mockup-api.svg?branch=master)](https://travis-ci.org/Ort-Maximax/lpp-front-mockup-api) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b6573aec1704497788e0fceed4762121)](https://www.codacy.com/app/EISAWESOME/lpp-front-mockup-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ort-Maximax/lpp-front-mockup-api&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/03accaf06b9a473ba460bf122b519cd2)](https://www.codacy.com/app/EISAWESOME/lpp-valparaiso-main-back?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ort-Maximax/lpp-valparaiso-main-back&amp;utm_campaign=Badge_Grade) [![Build Status](https://travis-ci.org/Ort-Maximax/lpp-valparaiso-main-back.svg?branch=master)](https://travis-ci.org/Ort-Maximax/lpp-valparaiso-main-back)
 
-# Mockup API
+# Main back
 
-API de mockup pour tester le client correctement
-https://valparaiso-mockup.herokuapp.com
+Point d'entrée de toute les requete du client. S'interface avec la MQ pour interagir avec les micro-services
 
+# REFONTES DES API EN COURS
 ---
 
 ## /getData
