@@ -1,0 +1,35 @@
+{
+  "name": "api-mockup",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "encrypt:env": "cat .env | travis encrypt --add",
+    "start": "node --max_old_space_size=2048 ./server.js",
+    "start:dev": "nodemon --max_old_space_size=2048 ./server.js",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "@okta/jwt-verifier": "^0.0.12",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "express-bearer-token": "^2.1.1",
+    "express-fileupload": "^0.4.0",
+    "express.io": "^1.1.13",
+    "python-shell": "^0.5.0",
+    "rimraf": "^2.6.2",
+    "send-seekable": "^1.0.4",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "btoa": "^1.2.1",
+    "eslint": "^4.19.1",
+    "eslint-config-strongloop": "^2.1.0",
+    "http-status": "^1.1.2",
+    "mocha": "^5.2.0",
+    "request": "^2.87.0"
+  }
+}
