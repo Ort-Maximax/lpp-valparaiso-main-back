@@ -7,11 +7,11 @@ const fileUpload = require('express-fileupload');
 const PythonShell = require('python-shell');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 
-
 const oktaJwtVerifier = new OktaJwtVerifier({
   issuer: 'https://dev-438691.oktapreview.com/oauth2/default',
 });
 
+// Auth middleware
 const authenticationRequired = (req, res, next) => {
   if (req.token) {
     return oktaJwtVerifier.verifyAccessToken(req.token)
@@ -45,7 +45,6 @@ const appRouter = (app) => {
         if (err) throw err;
         return res.status(200).send(results[0]);
       });
-
   });
 
   app.get('/streamFile', sendSeekable, (req, res) => {
@@ -54,7 +53,6 @@ const appRouter = (app) => {
     if (fs.existsSync(path)){
       fs.stat(path, function(error, stat) {
         if (error) { throw error; }
-        console.log(path);
         const stream = fs.createReadStream(path);
         res.sendSeekable(stream, { length: stat.size});
       });
@@ -63,24 +61,24 @@ const appRouter = (app) => {
     }
   });
 
-  app.get('/removeElement', authenticationRequired, (req, res) => {
+  app.post('/removeElement', authenticationRequired, (req, res) => {
     const pathPrefix = `${process.cwd()}/datas`;
-    const path = `${pathPrefix}/${req.query.path}`;
-    if (fs.existsSync(path)){
-      fs.stat(path, function(error, stat) {
-        if (error) { throw error; }
-        if (stat.isDirectory()){
-          rimraf(path, () => {
-            return res.status(200).send('Folder deleted');
-          });
-        } else {
-          fs.unlinkSync(path);
-          updateClient(req);
-          return res.status(200).send('File deleted');
-        }
-      });
-    }
+    req.body.forEach((path) => {
+      path = `${pathPrefix}/${path}`;
+      if (fs.existsSync(path)) {
 
+        fs.stat(path, (error, stat) => {
+          if (error) { throw error; }
+          if (stat.isDirectory()){
+            rimraf(path);
+          } else {
+            fs.unlinkSync(path);
+          }
+        });
+      }
+    });
+    updateClient(req);
+    return res.status(200).send('File deleted');
   });
 
   app.get('/downloadFile', authenticationRequired, (req, res) => {
@@ -98,11 +96,12 @@ const appRouter = (app) => {
     if (!req.files || !req.body.path) {
       return res.status(400).send('Missing file data');
     }
-    // The name of the input field (i.e. "sampleFile")
-    // is used to retrieve the uploaded file
     const file = req.files.data;
-    const path = req.body.path;
-    // Use the mv() method to place the file somewhere on your server
+    let path = req.body.path;
+    let i = 1;
+    while (fs.existsSync(`./datas/${path}`)){
+      path = `${req.body.path} (${i})`;
+    }
     file.mv(`./datas/${path}`, function(err) {
       if (err) {
         console.log(err);
@@ -135,8 +134,6 @@ const appRouter = (app) => {
       const arrPath = elPath.split('/');
       arrPath[arrPath.length - 1] = req.body.newName;
       const newPath = arrPath.join('/');
-
-      console.log(req.body.path, newPath);
 
       fs.rename(`./datas/${req.body.path}`,
         `${newPath}`, function(err) {
