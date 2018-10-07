@@ -4,12 +4,16 @@
 const fs = require('fs');
 const rimraf = require('rimraf');
 const fileUpload = require('express-fileupload');
+const pathLib = require('path');
 const PythonShell = require('python-shell');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
+const request = require('request');
 
 const oktaJwtVerifier = new OktaJwtVerifier({
   issuer: 'https://dev-438691.oktapreview.com/oauth2/default',
 });
+
+const authorizedFFMPEGActions = ['hflip', 'vflip', 'convert_mp4_h264'];
 
 // Auth middleware
 const authenticationRequired = (req, res, next) => {
@@ -148,6 +152,61 @@ const appRouter = (app) => {
     } else {
       return res.status(500).send('Error renaming element');
     }
+  });
+
+  /**
+   * paramètres à envoyer:
+   *  {
+   *    "method":"hflip | vflip | convert_mp4_h264",
+   *    "input":"FICHIER_SOURCE",
+   *    "output":"FICHIER_DESTINATION"
+   *  }
+   */
+  app.post('/ffmpegAction', (req, res) => {
+    // fichier source
+    let input = `./datas/${req.body.input}`;
+
+    // action ffmpeg à exécuter
+    let method = req.body.method;
+
+    if (!authorizedFFMPEGActions.includes(method))
+      return res.status(400).send('FFMPEG action unauthorized');
+
+    if (!fs.existsSync(input))
+      return res.status(400).send('File not found');
+
+    // préparation du nouveau fichier
+    let fullInput = pathLib.resolve(input);
+    let outputExtension = pathLib.extname(fullInput);
+    let outputFile = pathLib.basename(fullInput, outputExtension);
+    let outputPath = pathLib.dirname(fullInput);
+    let output = pathLib.format({
+      dir: outputPath,
+      name: `${outputFile}.${method}`,
+      ext: outputExtension,
+    });
+    // JSON à envoyer au WS
+    let jsonToSend = {
+      method: method,
+      input: fullInput,
+      output: output,
+    };
+    let stringifiedJson = JSON.stringify(jsonToSend);
+    // let ffmpegWsUrl = process.env.FFMPEG_API_URL;
+    let ffmpegWsUrl = 'http://localhost:5000/ffmpeg';
+    request.post({
+      uri: ffmpegWsUrl,
+      body: stringifiedJson,
+    }, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        console.log('BODY: ' + body);
+        return res.status(200).send('FFMPEG action sent');
+      } else {
+        console.log(body);
+        console.log(error);
+        return res.status(500).send('FFMPEG unreachable');
+      }
+    });
   });
 };
 
