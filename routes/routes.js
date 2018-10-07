@@ -154,15 +154,7 @@ const appRouter = (app) => {
     }
   });
 
-  /**
-   * paramètres à envoyer:
-   *  {
-   *    "method":"hflip | vflip | convert_mp4_h264",
-   *    "input":"FICHIER_SOURCE",
-   *    "output":"FICHIER_DESTINATION"
-   *  }
-   */
-  app.post('/ffmpegAction', (req, res) => {
+  app.post('/ffmpegAction', authenticationRequired, (req, res) => {
     // fichier source
     let input = `./datas/${req.body.input}`;
 
@@ -192,7 +184,6 @@ const appRouter = (app) => {
       output: output,
     };
     let stringifiedJson = JSON.stringify(jsonToSend);
-    // let ffmpegWsUrl = process.env.FFMPEG_API_URL;
     let ffmpegWsUrl = 'http://localhost:5000/ffmpeg';
     request.post({
       uri: ffmpegWsUrl,
@@ -202,7 +193,6 @@ const appRouter = (app) => {
         console.log('BODY: ' + body);
         return res.status(200).send('FFMPEG action sent');
       } else {
-        console.log(body);
         console.log(error);
         return res.status(500).send('FFMPEG unreachable');
       }
