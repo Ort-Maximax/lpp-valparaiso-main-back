@@ -32,3 +32,8 @@ Télécharge le fichier au path fournis
 
 ## /uploadFile
 Sauvegarde les fichiers sur le serveur au path fournis
+
+---
+
+## /ffmpegAction
+Effectue les actions suivante sur des vidéo et images : hflip (rotation horizontale), vflip (rotation verticale), convert_mp4_h264 (conversion de la vidéo en mp4 avec un codec h264).
