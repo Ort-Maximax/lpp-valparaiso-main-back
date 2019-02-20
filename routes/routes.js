@@ -154,7 +154,7 @@ const appRouter = (app) => {
     }
   });
 
-  app.post('/ffmpegAction', authenticationRequired, (req, res) => {
+  app.post('/ffmpegAction', (req, res) => {
     // fichier source
     let input = `./datas/${req.body.input}`;
 
